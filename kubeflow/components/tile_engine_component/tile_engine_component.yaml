@@ -1,0 +1,42 @@
+name: AE13 tile engine
+description: AE13 tile engine
+inputs:
+    - {name: slides_URI, type: String, description: GCS bucket URI of slides}
+    - {name: json_URI, type: String, description: GCS bucket URI of jsons}
+    - {name: mask_png_URI, type: String, description: GCS bucket URI of masks}
+    - {name: output_URI, type: String, description: Output URI of bucket}
+    - {name: slide_type, type: String, description: The stain of the slide} #\use to match json name with slide name if using a big directory for all jsons containing different type of stained slides
+    - {name: dcis_export_mode,type : String, description : How to handle dcis annotations 1)ignore 2)as_stroma 3)as_dcis}
+    - {name: num_cpu, type: Integer, description: Number of cpu for multiprocessing}
+    - {name: tile_size, type: Integer, description: Tile size for tile generation}
+    - {name: downsample, type: Integer, description: Downsample factor of WSI}
+
+#outputs:
+#     - name: output_npy_uri
+#       type: String
+#     - name: output_csv_uri
+#       type: String
+    
+implementation:
+  container:
+    image: asia.gcr.io/scancer/ae13/kubeflow/tile_engine:latest
+    command: [
+        python3, /ae13/tile_engine/tile_engine.py,
+        --slides_URI,              {inputValue: slides_URI},
+        --json_URI,                {inputValue: json_URI},
+        --mask_png_URI,            {inputValue: mask_png_URI},
+        --output_URI,              {inputValue: output_URI},
+        --slide_type,              {inputValue: slide_type},
+        --dcis_export_mode,        {inputValue: dcis_export_mode},
+        --num_cpu,                 {inputValue: num_cpu},
+        --tile_size,               {inputValue: tile_size},
+        --downsample,              {inputValue: downsample},
+    ]
+    
+# #      --output_npy_path_file,                  {inputValue: output_npy_path_file},
+# #      --output_csv_path_file,                   {inputValue: output_csv_path_file},
+      
+   
+#       --output_csv_path_file,                   {outputPath: output_csv_uri},
+
+    

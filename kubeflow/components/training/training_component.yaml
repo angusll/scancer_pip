@@ -1,0 +1,69 @@
+name: AE13 Training
+description: AE13 training.
+inputs:
+    - {name: train_tfrec_uri, type: String, description: GCS bucket URI of train tfrecords}
+    - {name: valid_tfrec_uri, type: String, description: GCS bucket URI of valid tfrecordss}
+    - {name: output_uri, type: String, description: Output URI of bucket}
+    - {name: experiment_id, type: String, description: Unique id for each experiment}
+    - {name: model_architecture, type: String, description: Model architechure}
+    - {name: loss_function, type: String, description: Loss Function to use}
+    - {name: image_aug_type, type: String, description: Type of image augmentation}
+    - {name: batch_size, type: Integer, description: Batch size}
+    
+    - {name: learning_rate, type: Float, description: Learning rate}
+    - {name: lr_start, type : Float, default  :  1e-3, description :  lr_start}
+    - {name: lr_min, type : Float, default  :  1e-7, description :  lr_min}
+    - {name: lr_max, type : Float, default  :  1e-2, description :  lr_max}
+    - {name: warmup_epochs, type : Integer, default  :  3, description :  warmup_epochs}
+    - {name: lr_sustain_epochs, type : Integer, default  :  0, description :  lr_sustain_epochs}
+    - {name: lr_decay, type : Float, default  :  0.8, description :  lr_decay}
+    - {name: epochs, type: Integer, description: Epoch}
+    
+    - {name: patience, type: Integer, description: Patience of early stopping}
+    
+outputs:
+  - {name: output_model_ckpt_uri, type: String}
+  - {name: MLPipeline UI metadata, type: UI metadata}
+#outputs:
+#     - name: output_npy_uri
+#       type: String
+#     - name: output_csv_uri
+#       type: String
+    
+implementation:
+  container:
+    image: asia.gcr.io/scancer/ae13/kubeflow/training:latest
+    command: [
+        python3, /ae13/training/train.py,
+        --train_tfrec_uri,              {inputValue: train_tfrec_uri},
+        --valid_tfrec_uri,              {inputValue: valid_tfrec_uri},
+        --output_uri,                   {inputValue: output_uri},
+        --experiment_id,                {inputValue: experiment_id},
+        --model_architecture,           {inputValue: model_architecture},
+        --loss_function,                {inputValue: loss_function},
+        --image_aug_type,               {inputValue: image_aug_type},
+        --batch_size,                   {inputValue: batch_size},
+        --epochs,                       {inputValue: epochs},
+        --learning_rate,                {inputValue: learning_rate},
+        --lr_start,                     {inputValue: lr_start},
+        --lr_min,                       {inputValue: lr_min},
+        --lr_max,                       {inputValue: lr_max},
+        --warmup_epochs,                {inputValue: warmup_epochs},
+        --lr_sustain_epochs,            {inputValue: lr_sustain_epochs},
+        --lr_decay,                     {inputValue: lr_decay},
+        
+        --patience,                     {inputValue: patience},
+        
+        --output_model_ckpt_URI_file,       {outputPath: output_model_ckpt_uri}, 
+    ]
+    
+    fileOutputs:
+    
+      MLPipeline UI metadata: /mlpipeline-ui-metadata.json
+# #      --output_npy_path_file,                  {inputValue: output_npy_path_file},
+# #      --output_csv_path_file,                   {inputValue: output_csv_path_file},
+      
+   
+#       --output_csv_path_file,                   {outputPath: output_csv_uri},
+
+    

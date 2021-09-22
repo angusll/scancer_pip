@@ -1,0 +1,40 @@
+name: AE13 Evaluation
+description: AE13 Evaluation.
+inputs:
+    - {name: tile_mask_uri, type  : String,  description :  GCS bucket URI of tile and masks}
+    - {name: train_valid_csv_uri, type  : String,  description :  GCS bucket URI of train valid csv.}
+    - {name: output_uri, type : String, description : Output URI of bucket}
+    - {name: model_uri, type : String, description : GCS URI of model}
+    - {name: experiment_id, type : String, description : Unique id of experiment}
+    - {name: slide_type, type : String, description : IHC or HE slides}
+    - {name: threshold, type : Float, default : 0.5, description : Threshold for predicted mask}
+
+    
+outputs:
+  - {name: MLPipeline UI metadata, type: UI metadata}
+#  - {name: MLPipeline Metrics,     type: Metrics}
+    
+implementation:
+  container:
+    image: asia.gcr.io/scancer/ae13/kubeflow/evaluate:latest
+    command: [
+        python3, /ae13/evaluate/evaluate.py,
+        --tile_mask_uri,                   {inputValue: tile_mask_uri},
+        --train_valid_csv_uri,             {inputValue: train_valid_csv_uri},
+        --model_uri,                       {inputValue: model_uri},
+        --output_uri,                      {inputValue: output_uri},
+        --experiment_id,                   {inputValue: experiment_id},
+        --slide_type,                      {inputValue: slide_type},
+        --threshold,                       {inputValue: threshold},
+    ]
+    
+    fileOutputs:
+      MLPipeline UI metadata: /mlpipeline-ui-metadata.json
+#      MLPipeline Metrics:     /mlpipeline-metrics.json
+# #      --output_npy_path_file,                  {inputValue: output_npy_path_file},
+# #      --output_csv_path_file,                   {inputValue: output_csv_path_file},
+      
+#       --output_npy_path_file,                   {outputPath: output_npy_uri},    
+#       --output_csv_path_file,                   {outputPath: output_csv_uri},
+
+    

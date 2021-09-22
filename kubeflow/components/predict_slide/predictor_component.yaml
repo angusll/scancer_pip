@@ -1,0 +1,31 @@
+name: AE13 slide prediction
+description: AE13 slide prediction. Results save in output_URI/slide_predictions
+inputs:
+    - {name: experiment_id, type : String, description : Unique id of experiment}
+    - {name: slides_URI, type : String, description : GCS bucket URI of slides}
+    - {name: slide_type, type : String, description : IHC or HE slides}
+    - {name: train_valid_csv_URI, type : String,  description : GCS bucket URI of train valid csv Just to get the scn id for prediction. Enter all for predict the whole bucket}
+    - {name: num_of_slides, type : Integer, default : 30, description : Number of slides to predict if uses whole bucket. No effect if provide csv URI}
+    - {name: output_URI, type : String, description : Output URI of bucket}
+    - {name: model_weights_URI, type : String, description : Model weight .h5 URI}
+    - {name: threshold, type : Float, default : 0.5, description : Threshold for predicted mask}
+    - {name: colour_adjust, type: Boolean, default : False , description: To use hed histogram matching or not}
+
+implementation:
+  container:
+    image: asia.gcr.io/scancer/ae13/kubeflow/predict:latest
+    command: [
+        python3, /ae13/predictor/slide_predictor.py,
+        --experiment_id,                   {inputValue: experiment_id},
+        --slides_URI,                      {inputValue: slides_URI},
+        --slide_type,                      {inputValue: slide_type},
+        --train_valid_csv_URI,             {inputValue: train_valid_csv_URI},
+        --num_of_slides,                   {inputValue: num_of_slides},
+        --output_URI,                      {inputValue: output_URI},
+        --model_weights_URI,               {inputValue: model_weights_URI},
+        --threshold,                       {inputValue: threshold},
+        --colour_adjust,                   {inputValue: colour_adjust}
+    ]
+    
+
+    
